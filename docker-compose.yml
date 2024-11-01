@@ -1,7 +1,7 @@
 
 services:
   judgeapi:
-    image: "judge-api" 
+    image: "mrarthur0507/judge-executor:1.0" 
     container_name: judge
     ports:
       - "5900:5900"  
@@ -21,15 +21,14 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
 
   worker:
-    image: "dotnet-dind:2.0"  
+    image: "mrarthur0507/judge-worker:1.0"  
     build:
       context: .
     depends_on:
       - rabbitmq
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock 
     environment:
       RABBITMQ_HOST: rabbitmq  
     deploy:
       replicas: 5  
+    privileged: true 
 

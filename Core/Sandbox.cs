@@ -24,7 +24,7 @@ public class Sandbox : IDisposable{
             process.WaitForExit();
         }
         path = $"/var/local/lib/isolate/{id}/box/";
-        File.Copy(code, path + "code.c");
+        File.WriteAllText(path + "code.c", code);
     }
 
 
