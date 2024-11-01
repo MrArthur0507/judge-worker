@@ -3,35 +3,11 @@ using JudgeContracts.ExecuteCodeConsumer;
 using MassTransit;
 using MassTransit.Configuration;
 using Microsoft.Extensions.Hosting;
-var host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices((hostContext, services) =>
-    {
-        
-        services.AddMassTransit(x =>
-        {
-            
-            x.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host("rabbitmq", "/", h =>
-                {
-                    h.Username("guest");
-                    h.Password("guest");
-                });
+using HostExtensions.ServiceConfig;
 
-                
-                cfg.ReceiveEndpoint("execute-code-queue", e =>
-                {
-                    e.ConfigureConsumer<ExecuteCodeConsumer>(context);
-                });
-            });
+IHostBuilder builder = Host.CreateDefaultBuilder();
+builder.LoadServices();
 
-            
-            x.AddConsumer<ExecuteCodeConsumer>();
-        });
-
-        
-        services.AddMassTransitHostedService();
-    })
-    .Build();
+var host = builder.Build();
 
 await host.RunAsync();

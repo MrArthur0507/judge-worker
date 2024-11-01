@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-public class LanguageDetector {
+public class LanguageDetector : ILanguageDetector {
     private readonly IServiceProvider _serviceProvider;
     public LanguageDetector(IServiceProvider serviceProvider)
     {
