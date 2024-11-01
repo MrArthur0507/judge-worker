@@ -13,7 +13,11 @@ namespace JudgeContracts.ExecuteCodeConsumer
         }
         public async Task Consume(ConsumeContext<ExecuteCode> context)
         {   
-            await _executor.ExecuteCode(context.Message);
+            string output = await _executor.ExecuteCode(context.Message);
+
+            await context.RespondAsync<ExecuteCodeResult>(new ExecuteCodeResult() {
+                Output = output
+            }); 
         }
 
     }
