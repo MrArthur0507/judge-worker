@@ -1,26 +1,17 @@
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
-
-RUN apk add --no-cache docker
-
-WORKDIR /src
-
-COPY ./ ./
-
-RUN dotnet restore
-
-RUN dotnet build --configuration Release --output /app/build
-
-RUN dotnet publish --configuration Release --output /app/publish
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS runtime
+FROM mrarthur0507/judge_dotnet_isolate:1.0 
 
 WORKDIR /app
-RUN apk add --no-cache docker-cli
-COPY --from=build /app/publish ./
 
+COPY . . 
 
-CMD ["sh", "-c", "dotnet JudgeWorker.dll"]
+RUN dotnet restore JudgeWorker.csproj
 
+RUN dotnet publish JudgeWorker.csproj -c Release -o /app/out 
 
+WORKDIR /app/out
 
+EXPOSE 5002
+ENV ASPNETCORE_URLS=http://*:5002
+ENV ASPNETCORE_ENVIRONMENT=Development
+
+CMD ["dotnet", "JudgeWorker.dll"]

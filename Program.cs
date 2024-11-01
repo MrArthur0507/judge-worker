@@ -1,8 +1,8 @@
 ﻿// Create and configure the Host for the worker
-using JudgeWorker;
+using JudgeContracts.ExecuteCodeConsumer;
 using MassTransit;
+using MassTransit.Configuration;
 using Microsoft.Extensions.Hosting;
-
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostContext, services) =>
     {
