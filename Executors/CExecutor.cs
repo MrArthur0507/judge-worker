@@ -1,11 +1,11 @@
 using System.Data.Common;
 using System.Diagnostics;
 
-public class CRunner {
+public class CExecutor : IExecutor{
 
     private readonly Sandbox _sandbox;
 
-    public CRunner(Sandbox sandbox)
+    public CExecutor(Sandbox sandbox)
     {
         _sandbox = sandbox;
     }
