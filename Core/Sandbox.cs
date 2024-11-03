@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using JudgeContracts;
 
 public class Sandbox : IDisposable{
     private int id;
@@ -28,12 +29,17 @@ public class Sandbox : IDisposable{
     }
 
 
-    public async Task<string> ExecuteCommand(string command, string stdin = null) {
+    public async Task<ExecuteCommandResult> ExecuteCommand(string command, string[] stdin = null) {
+        
+        ExecuteCommandResult executeCommandResult = new ExecuteCommandResult();
+
         ProcessStartInfo processStartInfo = new ProcessStartInfo {
             FileName = "isolate",
             Arguments = $"-b {id} -p " + 
                     "--env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin " +
                     "--stdout=out.txt " +
+                    "--stderr-to-stdout " +
+                    $"--meta={path}/meta.txt " +
                     $"--run -- {command}",
             RedirectStandardInput = true,
         };
@@ -42,15 +48,28 @@ public class Sandbox : IDisposable{
         {
             process.StartInfo = processStartInfo;
             process.Start();
-            using (StreamWriter sw = process.StandardInput)
-            {
-                sw.WriteLine(stdin);
+            if (stdin != null) {
+
+                using (StreamWriter sw = process.StandardInput)
+                {
+                    foreach (var item in stdin)
+                    {
+
+                        sw.WriteLine(item);
+
+                    }
+                }
             }
+            
             process.WaitForExit();
             using (StreamReader sr = new StreamReader(path + "out.txt"))
             {
-                return await sr.ReadToEndAsync();
-            }
+                
+                executeCommandResult.Output = await sr.ReadToEndAsync();
+            };
+            executeCommandResult.Meta = ExtractMeta();
+
+            return executeCommandResult;
         }
     }
 
@@ -73,5 +92,19 @@ public class Sandbox : IDisposable{
         Cleanup();
     }
 
+
+
+    private List<string?> ExtractMeta() {
+        List<string?> metaData = new List<string?>();
+        using (StreamReader sr = new StreamReader(path + "meta.txt"))
+        {
+            while (!sr.EndOfStream)
+            {
+                metaData.Add(sr.ReadLine());            
+            }
+        }
+
+        return metaData;
+    }
 
 }

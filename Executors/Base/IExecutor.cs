@@ -1,7 +1,7 @@
 public interface IExecutor
 {
-    public Task Compile(string code);
+    public Task<ExecuteCommandResult> Compile(string code);
 
-    public Task<string> Execute(string stdin); 
-    public Task<string> Execute(); 
+    public Task<ExecuteCommandResult> Execute(string[] stdin); 
+    public Task<ExecuteCommandResult> Execute(); 
 }

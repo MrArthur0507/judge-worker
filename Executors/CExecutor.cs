@@ -10,18 +10,21 @@ public class CExecutor : IExecutor{
         _sandbox = sandbox;
     }
 
-    public async Task Compile(string code) {
+    public async Task<ExecuteCommandResult> Compile(string code) {
         _sandbox.StartSandbox(code);
-        await _sandbox.ExecuteCommand("/usr/bin/gcc /box/code.c");
+        ExecuteCommandResult output = await _sandbox.ExecuteCommand("/usr/bin/gcc /box/code.c");
+        return output;
+
     }
-    public async Task<string> Execute() {
-        string output = await _sandbox.ExecuteCommand("/box/a.out");
+    public async Task<ExecuteCommandResult> Execute() {
+        ExecuteCommandResult output = await _sandbox.ExecuteCommand("/box/a.out");
         _sandbox.Cleanup();
         return output;
     }
-    public async Task<string> Execute(string stdin = null) {
-        string output = await _sandbox.ExecuteCommand("/box/a.out", stdin);
+    public async Task<ExecuteCommandResult> Execute(string[] stdin = null) {
+        ExecuteCommandResult output = await _sandbox.ExecuteCommand("/box/a.out", stdin);
         _sandbox.Cleanup();
         return output;
     }
+
 }

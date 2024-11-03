@@ -12,19 +12,26 @@ public class CodeExecutor : ICodeExecutor
         _logger = logger;
     }
 
-    public async Task<string> ExecuteCode(ExecuteCode executeCode)
+    public async Task<ExecuteCodeResult> ExecuteCode(ExecuteCode executeCode)
     {
+        ExecuteCodeResult executeCodeResult = new ExecuteCodeResult();
 
         try
         {
             IExecutor executor = _languageDetector.GetExecutor(executeCode.Language);
-            await executor.Compile(executeCode.Code);
-            return await executor.Execute();
+            ExecuteCommandResult compileOutput = await executor.Compile(executeCode.Code);
+            ExecuteCommandResult executionOutput = await executor.Execute();
+
+            executeCodeResult.CompileResult = compileOutput.Output;
+            executeCodeResult.CompileMeta = compileOutput.Meta;
+            executeCodeResult.Output = executionOutput.Output;
+            executeCodeResult.Meta = executionOutput.Meta;
+            return executeCodeResult;
         }
         catch 
         {
             _logger.Log("Something went wrong with executing or compiling the code!");
-            return "Unable to execute code";
+            return new ExecuteCodeResult();
         }
 
     }
